@@ -1,0 +1,29 @@
+from sklearn import datasets
+import math
+import scipy.sparse.linalg as ll
+import numpy as np
+
+iris = datasets.load_iris()
+X = iris.data
+
+# PCA
+def PCA(data, k):
+    data=data.T
+    d,m = data.shape
+    Z = np.zeros(m)
+    mu = np.mean(data,axis = 1)
+    mu = np.reshape(mu,(d,1))
+    mu_array = np.tile(mu, (1, m))
+    xc = data - mu_array
+    C = np.dot(xc,xc.T)/m
+    S,W = ll.eigs(C)
+    S = S.real
+    W = W.real
+    index = np.argsort(-S)
+    for i in range(k):     
+        dim = np.dot(W[:,index[i]].T,xc)/math.sqrt(S[index[i]]) # extract 1st eigenvalues
+        Z = np.column_stack((Z, dim))
+    Z = Z[:,1:]
+    return W, Z
+    
+    W, Z = PCA(X, k=3)
